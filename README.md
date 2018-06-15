@@ -1,6 +1,6 @@
 # Capco Algo Trading Workshop #
 
-Welcome to the Capco Algorithmic Trading Night of Chances 2018 WorkShop. Before we start, 
+Welcome to the Capco Algorithmic Trading WorkShop. Before we start, 
 please follow the steps below in order to prepare for the workshop.
 
 ### Git installation ###
@@ -11,7 +11,7 @@ source code of the application. Please, download the client from the following l
 After installation, you can checkout the repository running the following command from command
 line in a directory you wish to download the sources to:
 
-`git clone https://github.com/eriksuta/noc-algo-trader`
+`git clone https://github.com/eriksuta/nxt-ws-algo`
 
 ### Maven install ###
 Our application uses maven as a build tool. In order to build the application from downloaded sources. To
