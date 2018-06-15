@@ -33,7 +33,7 @@ Other option is to build and run it from command line. Navigate to application r
 
 After this step, you should be able to navigate to `http://localhost:8080/` in your favourite browser and
 see the following index page:
-![Login Page](https://github.com/eriksuta/noc-algo-trader/blob/master/media/index-page.PNG "Login Page")
+![Login Page](https://github.com/eriksuta/nxt-ws-algo/blob/master/media/index-page.PNG "Login Page")
 
 We will start our workshop from this step. Looking forward to seeing you all.
 
