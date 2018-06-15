@@ -1,0 +1,160 @@
+<h2>Portfolio (Strategy: {{$ctrl.dashboardData.strategyName}})</h2>
+<div layout="row">
+    <div layout="column" flex="70">
+
+        <!-- Net Asset Value -->
+        <div layout="row">
+            <p flex="40" class="md-subhead">NLV (start):</p>
+            <p flex="60" class="md-subhead">
+                <b>{{formatNumber($ctrl.initialPortfolioValue.toFixed(3))}} $</b>
+            </p>
+        </div>
+
+        <div layout="row">
+            <p flex="40" class="md-subhead">NLV:</p>
+            <p flex="60" class="md-subhead">
+                <b>{{formatNumber($ctrl.portfolioNetAssetValue.toFixed(3))}} $</b>
+            </p>
+        </div>
+
+        <!-- Total Earnings -->
+        <div layout="row">
+            <p flex="40" class="md-subhead">Earnings:</p>
+            <p flex="60" class="md-subhead" style="color: {{determineEarningsColor()}}">
+                <b>{{formatNumber(calculateTotalEarnings().toFixed(3))}} $</b>
+            </p>
+        </div>
+
+        <!-- Total Earnings in % -->
+        <div layout="row">
+            <p flex="40" class="md-subhead">Performance (%):</p>
+            <p flex="60" class="md-subhead" style="color: {{determineEarningsColor()}}">
+                <b>{{formatNumber(calculateTotalEarningsInPercent().toFixed(3))}} %</b>
+            </p>
+        </div>
+
+        <br><br>
+
+        <div layout="row">
+            <p flex="40">Cash Balance</p>
+            <p flex="60">
+                <b>{{formatNumber($ctrl.dashBoardData.cashBalance.toFixed(3))}} $</b>
+                <span style="color: {{formatValue($ctrl.cashBalanceChange)}}">
+                    ({{formatNumber($ctrl.cashBalanceChange.toFixed(2))}})
+                </span>
+            </p>
+        </div>
+
+        <md-table-container>
+            <table md-table multiple ng-model="selected" md-progress="promise">
+                <thead md-head md-order="query.order">
+                <tr md-row>
+                    <th md-column>Ticker</th>
+                    <th md-column md-numeric>Position</th>
+                    <th md-column md-numeric>Unit Value</th>
+                    <th md-column md-numeric>Total</th>
+                    <th md-column md-numeric>% of Pf</th>
+                    <th md-column md-numeric>Earnings</th>
+                    <th md-column md-numeric>Perf</th>
+                </tr>
+                </thead>
+
+                <tbody md-body>
+                <tr md-row md-select-id="name" md-auto-select ng-repeat="product in $ctrl.dashBoardData.products">
+                    <td md-cell>{{product.ticker}}</td>
+                    <td md-cell>{{formatNumber(product.position)}}</td>
+                    <td md-cell>{{product.unitValue}}</td>
+                    <td md-cell>{{formatNumber(product.value.toFixed(2))}}</td>
+                    <td md-cell>{{formatNumber(calculateAssetPercentInPortfolio(product.value).toFixed(2))}} %</td>
+                    <td md-cell style="color: {{formatValue(calculateAssetEarnings(product))}}">
+                        {{formatNumber(calculateAssetEarnings(product).toFixed(2))}}
+                    </td>
+                    <td md-cell style="color: {{formatValue(calculateAssetEarningsPercentage(product))}}">
+                        {{formatNumber(calculateAssetEarningsPercentage(product).toFixed(2))}} %
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+
+    </div>
+
+    <div layout="column" flex="30">
+        <canvas id="doughnut" class="chart chart-doughnut"
+                chart-data="$ctrl.currentPortfolioData"
+                chart-labels="$ctrl.currentPortfolioLabels"
+                chart-options="$ctrl.currentPortfolioOptions">
+        </canvas>
+    </div>
+</div>
+
+<!-- Chart Container -->
+<div>
+    <hr>
+    <h2>Performance Chart</h2>
+
+    <md-input-container class="md-block" flex-gt-sm>
+        <label>Select Depth of Data</label>
+        <md-select ng-model="$ctrl.depthSelect.selected" ng-change="$ctrl.populateDashboardData()">
+            <md-option ng-repeat="state in $ctrl.depthSelect.entries" value="{{state}}">
+                {{state}}
+            </md-option>
+        </md-select>
+    </md-input-container>
+
+    <div ng-show="$ctrl.depthSelect.selected == 'Portfolio'">
+        <div flex>
+            <canvas id="bar" class="chart chart-bar"
+                    chart-data="$ctrl.portfolioChart.data"
+                    chart-labels="$ctrl.portfolioChart.labels"
+                    chart-series="$ctrl.portfolioChart.series"
+                    chart-options="$ctrl.portfolioChart.options">
+            </canvas>
+        </div>
+    </div>
+
+    <div ng-show="$ctrl.depthSelect.selected == 'Asset'">
+        <div flex>
+            <canvas id="line" class="chart chart-line"
+                    chart-data="$ctrl.assetChart.data"
+                    chart-labels="$ctrl.assetChart.labels"
+                    chart-series="$ctrl.assetChart.series"
+                    chart-options="$ctrl.assetChart.options">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Portfolio Performance table -->
+<div>
+    <hr>
+    <h2>Portfolio Performance</h2>
+    <md-table-container>
+        <table md-table multiple ng-model="selected" md-progress="promise">
+            <thead md-head md-order="query.order" md-on-reorder="getDesserts">
+                <tr md-row>
+                    <th md-column>Date</th>
+                    <th md-column md-numeric>NAV</th>
+                    <th md-column md-numeric>Cash</th>
+                    <th md-column md-numeric>Company A</th>
+                    <th md-column md-numeric>Company B</th>
+                    <th md-column md-numeric>Company C</th>
+                    <th md-column md-numeric>Company D</th>
+                </tr>
+            </thead>
+
+            <tbody md-body>
+                <tr md-row md-select-id="name" md-auto-select ng-repeat="row in $ctrl.dataTable">
+                    <td md-cell>{{row.date}}</td>
+                    <td md-cell>{{formatNumber(row.netAssetValue.toFixed(2))}}</td>
+                    <td md-cell>{{formatNumber(row.cashBalance.toFixed(2))}}</td>
+                    <td md-cell>{{formatNumber(row.companyA.toFixed(2))}}</td>
+                    <td md-cell>{{formatNumber(row.companyB.toFixed(2))}}</td>
+                    <td md-cell>{{formatNumber(row.companyC.toFixed(2))}}</td>
+                    <td md-cell>{{formatNumber(row.companyD.toFixed(2))}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+</div>
+
